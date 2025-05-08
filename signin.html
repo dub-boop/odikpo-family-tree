@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Odikpo Family Tree</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+            color: #333;
+            display: flex;
+            flex-direction: column; /* Arrange content vertically */
+            justify-content: center; /* Center content vertically */
+            align-items: center;
+            min-height: 100vh; /* Full viewport height */
+            position: relative; /* Needed for absolute positioning of figures */
+            overflow: hidden; /* Hide overflow from figures */
+        }
+
+        header {
+            width: 100%;
+            padding: 1rem 1.5rem; /* Add padding to the header */
+            background-color: #ffffff; /* White background for header */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+            position: absolute; /* Position header at the top */
+            top: 0;
+            left: 0;
+            z-index: 20; /* Ensure header is above other content */
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            /* Styles for the logo container within the header */
+            padding: 0; /* Remove previous padding as it's now in the header */
+            position: static; /* Remove absolute positioning from logo itself */
+            top: auto;
+            left: auto;
+            z-index: auto;
+        }
+
+        .logo img {
+            height: 40px; /* Adjust height as needed for your logo */
+            width: auto; /* Maintain aspect ratio */
+        }
+
+
+        .login-container {
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* shadow-lg */
+            text-align: center;
+            max-width: 400px;
+            width: 90%; /* Responsive width */
+            z-index: 10; /* Ensure form is above figures */
+            margin: 2rem; /* Keep margin around the login form */
+            /* Add top margin to push content below the header */
+            margin-top: 6rem; /* Adjust based on header height */
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            box-sizing: border-box; /* Include padding and border in element's total width and height */
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #a78bfa; /* A shade of purple, similar to the image */
+            color: white;
+            border-radius: 0.375rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            font-size: 1rem;
+        }
+
+        .login-button:hover {
+            background-color: #8b5cf6; /* Darker purple on hover */
+        }
+
+        /* Style for the Admin Login Link */
+        .admin-login-link {
+            display: block; /* Make it a block element for margin */
+            margin-top: 1rem; /* Space above the link */
+            font-size: 0.875rem; /* text-sm */
+            color: #3b82f6; /* Blue color */
+            text-decoration: none; /* Remove underline */
+            transition: color 0.2s ease-in-out;
+        }
+
+        .admin-login-link:hover {
+            color: #2563eb; /* Darker blue on hover */
+            text-decoration: underline; /* Add underline on hover */
+        }
+
+
+        /* Abstract Figures - Using simple divs with background colors */
+        .figure {
+            position: absolute;
+            bottom: 0;
+            width: 150px; /* Adjust size as needed */
+            height: 250px; /* Adjust size as needed */
+            background-color: #d8b4fe; /* Light purple */
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* Triangle shape */
+            opacity: 0.7;
+            z-index: 0; /* Ensure figures are behind the form */
+        }
+
+        .figure-left {
+            left: 5%; /* Position on the left */
+            transform: rotate(180deg); /* Flip vertically */
+             background-color: #a7f3d0; /* Light green */
+        }
+
+        .figure-right {
+            right: 5%; /* Position on the right */
+             background-color: #fcd34d; /* Yellow */
+        }
+
+         /* Adjust figure positioning for smaller screens */
+         @media (max-width: 767px) {
+            .figure {
+                width: 100px;
+                height: 180px;
+            }
+            .figure-left {
+                left: -20px; /* Move slightly off-screen */
+            }
+             .figure-right {
+                right: -20px; /* Move slightly off-screen */
+            }
+         }
+
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="https://placehold.co/100x40/e0e0e0/333?text=Logo" alt="Odikpo Family Tree Logo">
+        </div>
+    </header>
+
+
+    <div class="login-container">
+        <div class="title">THE ODIKPO KINDRED</div>
+        <div class="subtitle">A FAMILY TREE</div>
+
+        <form id="login-form">
+            <input type="text" id="unique-id" class="input-field" placeholder="Input your unique ID" required>
+            <button type="submit" class="login-button">Login</button>
+        </form>
+
+        <a href="#" id="admin-login-link" class="admin-login-link">Admin Login</a>
+    </div>
+
+    <div class="figure figure-left"></div>
+    <div class="figure figure-right"></div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('login-form');
+            const uniqueIdInput = document.getElementById('unique-id');
+            const adminLoginLink = document.getElementById('admin-login-link'); // Get the admin login link
+
+
+            if (loginForm) {
+                loginForm.addEventListener('submit', (event) => {
+                    event.preventDefault(); // Prevent default form submission
+
+                    const uniqueId = uniqueIdInput.value.trim();
+
+                    if (uniqueId) {
+                        // In a real application, you would send this ID to a backend
+                        // for validation and authentication.
+                        console.log("Attempting user login with ID:", uniqueId);
+
+                        // Placeholder for successful user login: Redirect to the main family tree page
+                        // window.location.href = 'index.html#tree-view'; // Assuming your main page is index.html
+
+                        alert(`User login simulated for ID: ${uniqueId}. (Authentication not implemented)`);
+
+                        // Clear the input field after simulation
+                        uniqueIdInput.value = '';
+
+                    } else {
+                        alert("Please enter your unique ID.");
+                    }
+                });
+            }
+
+            // Handle Admin Login link click
+            if (adminLoginLink) {
+                adminLoginLink.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent default link behavior
+
+                    console.log("Admin login link clicked.");
+
+                    // Placeholder for admin login: Redirect to an admin login page or show a modal
+                    // For now, just show an alert
+                    alert("Admin Login clicked. (Admin login functionality not implemented)");
+
+                    // In a real application, you would redirect to a dedicated admin login page:
+                    // window.location.href = 'admin_login.html'; // Example admin login page URL
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
