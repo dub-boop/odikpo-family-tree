@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odikpo Family Tree</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Custom styles for layout adjustments and specific elements */
+        body {
+            font-family: "Inter", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .main-content-area {
+            display: flex;
+            flex-direction: column; /* Default to column on small screens */
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .main-content-area {
+                flex-direction: row; /* Row layout on medium and larger screens */
+            }
+        }
+
+        .sidebar {
+            flex: 0 0 280px; /* Fixed width sidebar on larger screens */
+            /* Allow sidebar to take full width on small screens via Tailwind w-full */
+        }
+
+        /* Hide sidebar when the 'hide-sidebar' class is on main-content-area */
+        .main-content-area.hide-sidebar .sidebar {
+            display: none;
+        }
+
+         /* Allow content display to take full width when sidebar is hidden */
+        .main-content-area.hide-sidebar .content-display {
+             flex-grow: 1; /* Ensure it takes available space */
+             width: 100%; /* Take full width */
+        }
+
+
+        .content-display {
+            flex-grow: 1; /* Main content takes remaining space */
+        }
+
+        /* Hide content sections by default, show based on active link */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+         /* Style for the simple navigation simulation */
+        .nav-link {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem; /* rounded-md */
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            background-color: #e5e7eb; /* hover:bg-gray-200 */
+        }
+
+        .nav-link.active {
+            background-color: #d1d5db; /* bg-gray-300 */
+            font-weight: bold;
+        }
+
+        /* --- Hamburger Menu Styles --- */
+        /* Hide the regular nav on small screens */
+        .app-nav {
+            display: none;
+        }
+
+        /* Show hamburger button on small screens */
+        .hamburger-button {
+            display: block; /* Show by default */
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333; /* Adjust color as needed */
+            padding: 0.5rem;
+        }
+
+        /* Hide hamburger button on medium and larger screens */
+        @media (min-width: 768px) {
+            .app-nav {
+                display: flex !important; /* Override display: none */
+            }
+            .hamburger-button {
+                display: none;
+            }
+        }
+
+        /* Mobile menu container */
+        .mobile-menu {
+            position: absolute; /* Position relative to nearest positioned ancestor (header) */
+            top: 100%; /* Position below the header */
+            left: 0;
+            right: 0;
+            background-color: #ffffff; /* White background */
+            border-bottom: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 1rem;
+            z-index: 20; /* Ensure it's above other content */
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mobile-menu.is-open {
+            display: flex; /* Show when the 'is-open' class is added */
+        }
+
+        .mobile-menu .nav-link {
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            text-align: center;
+            width: 100%; /* Full width links */
+        }
+        /* --- End Hamburger Menu Styles --- */
+
+
+        /* Basic styling for member cards (Members section) */
+        .member-card {
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* shadow-md */
+        }
+
+        .member-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 9999px; /* rounded-full */
+            object-fit: cover;
+            margin: 0 auto 0.75rem auto; /* mx-auto mb-3 */
+        }
+
+        /* Basic styling for timeline items (History section) */
+        .timeline-item {
+            display: flex;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-marker {
+            width: 1rem;
+            height: 1rem;
+            background-color: #3b82f6; /* bg-blue-500 */
+            border-radius: 9999px; /* rounded-full */
+            flex-shrink: 0;
+            margin-right: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-marker::after {
+            content: '';
+            position: absolute;
+            top: 1rem;
+            left: 0.4375rem; /* Center the line */
+            bottom: -1.5rem; /* Extend line downwards */
+            width: 2px;
+            background-color: #d1d5db; /* bg-gray-300 */
+        }
+
+         .timeline-item:last-child .timeline-marker::after {
+            display: none; /* Hide line for the last item */
+         }
+
+
+        .timeline-content {
+            flex-grow: 1;
+            background-color: #ffffff; /* bg-white */
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* shadow-md */
+        }
+
+         .timeline-content h3 {
+             margin-top: 0;
+             margin-bottom: 0.5rem;
+             font-size: 1.125rem; /* text-lg */
+             font-weight: bold;
+         }
+
+         .timeline-content .era {
+             font-size: 0.875rem; /* text-sm */
+             color: #6b7280; /* text-gray-500 */
+             margin-bottom: 0.75rem;
+         }
+
+         .timeline-content p {
+             margin-bottom: 0.5rem;
+         }
+
+         .timeline-tag {
+             display: inline-block;
+             background-color: #e5e7eb; /* bg-gray-200 */
+             padding: 0.25rem 0.5rem;
+             border-radius: 0.25rem; /* rounded */
+             font-size: 0.75rem; /* text-xs */
+             margin-right: 0.5rem;
+             margin-top: 0.5rem;
+         }
+
+         /* Basic styling for gallery items */
+         .gallery-grid {
+             display: grid;
+             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Responsive grid */
+             gap: 1rem;
+         }
+
+         .gallery-item {
+              border: 1px solid #e5e7eb; /* border-gray-200 */
+              border-radius: 0.5rem; /* rounded-lg */
+              padding: 0.75rem;
+              text-align: center;
+              background-color: #ffffff; /* bg-white */
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* shadow-md */
+         }
+
+         .gallery-item img {
+             max-width: 100%;
+             height: auto;
+             border-radius: 0.375rem; /* rounded-md */
+             margin-bottom: 0.5rem;
+         }
+
+         .gallery-item p {
+             font-size: 0.875rem; /* text-sm */
+             color: #4b5563; /* text-gray-600 */
+         }
+
+         /* --- Modal Styles --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50; /* Above everything else */
+            visibility: hidden; /* Use visibility for smooth transition */
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        .modal-overlay.is-visible {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.75rem; /* rounded-xl */
+            max-width: 500px; /* Limit modal width */
+            width: 95%; /* Make it responsive */
+            max-height: 90vh; /* Limit modal height */
+            overflow-y: auto; /* Add scroll if content is too long */
+            position: relative;
+            transform: translateY(20px); /* Initial state for animation */
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .modal-overlay.is-visible .modal-content {
+             transform: translateY(0); /* Final state for animation */
+        }
+
+        .modal-close-button {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280; /* text-gray-500 */
+        }
+
+        .modal-close-button:hover {
+             color: #333;
+        }
+
+        .modal-member-photo {
+             width: 100px;
+             height: 100px;
+             border-radius: 9999px; /* rounded-full */
+             object-fit: cover;
+             margin: 0 auto 1rem auto; /* Center and add margin */
+        }
+
+        .modal-content h3 {
+            text-align: center;
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .modal-details p {
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            color: #4b5563; /* text-gray-600 */
+        }
+
+         .modal-details p strong {
+             color: #1f2937; /* text-gray-800 */
+         }
+
+        /* --- End Modal Styles --- */
+
+        /* --- Gallery Sub-tab Styles --- */
+        .gallery-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb; /* border-gray-200 */
+        }
+
+        .gallery-tab-button {
+            padding: 0.75rem 1.5rem;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #6b7280; /* text-gray-500 */
+            transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
+            border-bottom: 2px solid transparent;
+        }
+
+        .gallery-tab-button:hover {
+            color: #333;
+        }
+
+        .gallery-tab-button.active {
+            color: #3b82f6; /* text-blue-500 */
+            border-bottom-color: #3b82f6; /* border-blue-500 */
+            font-weight: bold;
+        }
+
+        .gallery-content {
+            display: none; /* Hide content by default */
+        }
+
+        .gallery-content.active {
+            display: block; /* Show active content */
+        }
+
+        .gallery-placeholder {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280; /* text-gray-500 */
+            font-size: 1.125rem; /* text-lg */
+        }
+
+        .gallery-placeholder button {
+             margin-top: 1rem;
+             padding: 0.75rem 1.5rem;
+             background-color: #3b82f6;
+             color: white;
+             border-radius: 0.375rem;
+             font-weight: bold;
+             transition: background-color 0.2s ease-in-out;
+        }
+
+         .gallery-placeholder button:hover {
+             background-color: #2563eb;
+         }
+
+        /* --- End Gallery Sub-tab Styles --- */
+
+        /* --- Members Page Specific Styles --- */
+        .members-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .members-controls {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .generation-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem; /* Space below generation filters */
+        }
+
+        .generation-filter-button {
+             padding: 0.5rem 1rem;
+             border: 1px solid #d1d5db; /* border-gray-300 */
+             border-radius: 0.375rem; /* rounded-md */
+             background-color: #f9fafb; /* bg-gray-50 */
+             cursor: pointer;
+             font-size: 0.875rem; /* text-sm */
+             transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+
+        .generation-filter-button:hover {
+             background-color: #e5e7eb; /* hover:bg-gray-200 */
+             border-color: #d1d5db;
+        }
+
+        .generation-filter-button.active {
+             background-color: #3b82f6; /* bg-blue-500 */
+             color: white;
+             border-color: #3b82f6;
+        }
+
+        .view-toggle-buttons {
+             display: flex;
+             gap: 0.5rem;
+        }
+
+        .view-toggle-button {
+             padding: 0.5rem 1rem;
+             border: 1px solid #d1d5db; /* border-gray-300 */
+             border-radius: 0.375rem; /* rounded-md */
+             background-color: #f9fafb; /* bg-gray-50 */
+             cursor: pointer;
+             font-size: 0.875rem; /* text-sm */
+             transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+
+        .view-toggle-button:hover {
+             background-color: #e5e7eb; /* hover:bg-gray-200 */
+             border-color: #d1d5db;
+        }
+
+        .view-toggle-button.active {
+             background-color: #3b82f6; /* bg-blue-500 */
+             color: white;
+             border-color: #3b82f6;
+        }
+
+        /* Adjust members grid based on view toggle */
+        .members-grid.list-view {
+            display: flex; /* Use flex for list view */
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .members-grid.list-view .member-card {
+             display: flex;
+             align-items: center;
+             text-align: left;
+             padding: 0.75rem 1rem; /* Adjust padding for list view */
+             box-shadow: none; /* Remove shadow in list view */
+             border: 1px solid #e5e7eb; /* Keep border */
+        }
+
+        .members-grid.list-view .member-photo {
+             width: 50px; /* Smaller photo in list view */
+             height: 50px;
+             margin: 0 1rem 0 0; /* Adjust margin */
+        }
+
+        .members-grid.list-view .member-card h3 {
+             font-size: 1rem; /* Smaller font size */
+             margin-bottom: 0.25rem;
+        }
+
+         .members-grid.list-view .member-card p {
+             font-size: 0.875rem; /* Smaller font size */
+             margin-bottom: 0.25rem;
+             margin-right: 1rem; /* Space between details */
+         }
+
+         .members-grid.list-view .member-card .view-details-button {
+             margin-left: auto; /* Push button to the right */
+             flex-shrink: 0; /* Prevent button from shrinking */
+         }
+
+        /* --- End Members Page Specific Styles --- */
+
+
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <header class="bg-gray-100 py-4 border-b border-gray-300 shadow-sm relative">
+        <div class="container flex items-center justify-between">
+            <div class="text-2xl font-bold text-gray-800">Odikpo Family Tree</div>
+
+            <nav class="app-nav flex flex-wrap justify-center md:justify-start gap-2 md:gap-4">
+                <a href="#tree-view" class="nav-link active" data-section="tree-view">Tree View</a>
+                <a href="#members" class="nav-link" data-section="members">Members</a>
+                <a href="#history" class="nav-link" data-section="history">History</a>
+                <a href="#gallery" class="nav-link" data-section="gallery">Gallery</a>
+            </nav>
+
+            <button class="hamburger-button md:hidden" id="hamburger-button">
+                 <i class="fas fa-bars"></i>
+             </button>
+
+            </div>
+
+        <div class="mobile-menu md:hidden" id="mobile-menu">
+             <a href="#tree-view" class="nav-link" data-section="tree-view">Tree View</a>
+             <a href="#members" class="nav-link" data-section="members">Members</a>
+             <a href="#history" class="nav-link" data-section="history">History</a>
+             <a href="#gallery" class="nav-link" data-section="gallery">Gallery</a>
+        </div>
+    </header>
+
+    <main class="container py-6 flex-grow">
+        <div class="main-content-area">
+
+            <aside class="sidebar w-full md:w-auto bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Controls</h2>
+
+                <div class="mb-4">
+                    <h3 class="text-lg font-medium mb-2 text-gray-600">Search</h3>
+                    <input type="text" id="sidebar-search-input" placeholder="Search..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="text-lg font-medium mb-2 text-gray-600">Filter by Branch</h3>
+                    <div class="space-y-2" id="branch-filters">
+                        <label class="flex items-center text-gray-700"><input type="radio" name="branch" value="all" class="mr-2 rounded-full text-blue-500 focus:ring-blue-500" checked> All Branches</label>
+                        <label class="flex items-center text-gray-700"><input type="radio" name="branch" value="nwuchendu" class="mr-2 rounded-full text-blue-500 focus:ring-blue-500"> Nwuchendu</label>
+                        <label class="flex items-center text-gray-700"><input type="radio" name="branch" value="osekwe" class="mr-2 rounded-full text-blue-500 focus:ring-blue-500"> Osekwe</label>
+                         </div>
+                </div>
+
+                 <div class="mb-4">
+                    <h3 class="text-lg font-medium mb-2 text-gray-600">Filter by Generation</h3>
+                    <div class="generation-filters flex flex-wrap gap-1" id="sidebar-generation-filters">
+                         <button class="generation-filter-button active">All</button>
+                         <button class="generation-filter-button">1st Gen</button>
+                         <button class="generation-filter-button">2nd Gen</button>
+                         <button class="generation-filter-button">3rd Gen</button>
+                         <button class="generation-filter-button">4th Gen</button>
+                         <button class="generation-filter-button">5th Gen</button>
+                         <button class="generation-filter-button">6th Gen</button>
+                         <button class="generation-filter-button">7th Gen</button>
+                         <button class="generation-filter-button">8th Gen</button>
+                         <button class="generation-filter-button">9th Gen</button>
+                         <button class="generation-filter-button">10th Gen</button>
+                         <button class="generation-filter-button">11th Gen</button>
+                         <button class="generation-filter-button">12th Gen</button>
+                         <button class="generation-filter-button">13th Gen</button>
+                     </div>
+                 </div>
+
+
+                <div class="mb-4">
+                    <h3 class="text-lg font-medium mb-2 text-gray-600">View Controls</h3>
+                    <div class="flex gap-2 mb-2">
+                         <button class="flex-1 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"><i class="fas fa-arrows-alt-v mr-1"></i> Vertical</button>
+                         <button class="flex-1 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"><i class="fas fa-arrows-alt-h mr-1"></i> Horizontal</button>
+                    </div>
+                     <div class="flex gap-2">
+                         <button class="flex-1 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"><i class="fas fa-search-minus"></i> Zoom Out</button>
+                         <button class="flex-1 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"><i class="fas fa-search-plus"></i> Zoom In</button>
+                         <button class="flex-1 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"><i class="fas fa-sync-alt"></i> Reset</button>
+                     </div>
+                </div>
+
+                <div class="mb-4">
+                     <button class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-200">
+                        <i class="fas fa-download mr-2"></i>Export Tree
+                    </button>
+                </div>
+
+
+                <div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-700">Family Stats</h3>
+                    <p class="text-gray-600">Total Members: <span class="font-medium" id="stat-total-members">0</span></p>
+                    <p class="text-gray-600">Generations: <span class="font-medium" id="stat-generations">0</span></p>
+                    <p class="text-gray-600">Oldest Member: <span class="font-medium" id="stat-oldest-member">N/A</span></p>
+                    <p class="text-gray-600">Newest Addition: <span class="font-medium" id="stat-newest-addition">N/A</span></p>
+                </div>
+            </aside>
+
+            <div class="content-display bg-white p-6 rounded-lg shadow-md border border-gray-200">
+
+                <section id="tree-view" class="content-section active">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+                         <h2 class="text-2xl font-bold text-gray-800 mb-2 md:mb-0">Odikpo Family Tree</h2>
+                         <div class="flex gap-2">
+                             <button class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-100"><i class="fas fa-users mr-1"></i> Family View</button>
+                             <button class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-100"><i class="fas fa-user mr-1"></i> Individual</button>
+                             <button class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-100"><i class="fas fa-clock mr-1"></i> Timeline</button>
+                         </div>
+                    </div>
+                    <div class="tree-visualization border border-gray-300 h-96 flex items-center justify-center text-gray-500 rounded-md">
+                        <p>Family Tree Visualization Area</p>
+                    </div>
+                </section>
+
+                <section id="members" class="content-section">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+                         <h2 class="text-2xl font-bold text-gray-800 mb-2 md:mb-0">Family Members</h2>
+                         </div>
+
+                    <div class="mb-4">
+                        <h3 class="text-lg font-medium mb-2 text-gray-600">Filter by Generation</h3>
+                        <div class="generation-filters flex flex-wrap gap-1" id="members-generation-filters">
+                             <button class="generation-filter-button active">All</button>
+                             <button class="generation-filter-button">1st Gen</button>
+                             <button class="generation-filter-button">2nd Gen</button>
+                             <button class="generation-filter-button">3rd Gen</button>
+                             <button class="generation-filter-button">4th Gen</button>
+                             <button class="generation-filter-button">5th Gen</button>
+                             <button class="generation-filter-button">6th Gen</button>
+                             <button class="generation-filter-button">7th Gen</button>
+                             <button class="generation-filter-button">8th Gen</button>
+                             <button class="generation-filter-button">9th Gen</button>
+                             <button class="generation-filter-button">10th Gen</button>
+                             <button class="generation-filter-button">11th Gen</button>
+                             <button class="generation-filter-button">12th Gen</button>
+                             <button class="generation-filter-button">13th Gen</button>
+                         </div>
+                     </div>
+
+                    <div class="view-toggle-buttons mb-6">
+                         <button class="view-toggle-button active" data-view="grid"><i class="fas fa-th mr-1"></i> Grid View</button>
+                         <button class="view-toggle-button" data-view="list"><i class="fas fa-list mr-1"></i> List View</button>
+                     </div>
+
+
+                    <div class="members-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        </div>
+                </section>
+
+                <section id="history" class="content-section">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Odikpo Family History</h2>
+                    <div class="history-timeline relative">
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h3>Odikpo Kindred Begins</h3>
+                                <p class="era">Ancient Times (1st Generation)</p>
+                                <p>The patriarch of the Odikpo kindred, Onaga, established the family lineage in Eastern Nigeria, founding what would become a large family with many generations.</p>
+                                <span class="timeline-tag">Founding</span>
+                            </div>
+                        </div>
+                         <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h3>Second Generation</h3>
+                                <p class="era">Historical Era (2nd Generation)</p>
+                                <p>The second generation of the Odikpo kindred included Oluorhu and Okoji, sons of Onaga, who continued the family legacy in Eastern Nigeria.</p>
+                            </div>
+                        </div>
+                         <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h3>Growth of the Kindred</h3>
+                                <p class="era">Historical Era (3rd-5th Generations)</p>
+                                <p>Generations 3-5 saw the expansion of the family under Odobianu, Okpalo, and Odikpo himself, for whom the kindred is named.</p>
+                                <span class="timeline-tag">Family Name</span>
+                            </div>
+                        </div>
+                         <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h3>Family Branches Form</h3>
+                                <p class="era">Recent Centuries (6th and 7th Generations)</p>
+                                <p>The sixth and seventh generations saw the formation of key family branches under Nneuchendu, Oosikwe, and their children.</p>
+                                <span class="timeline-tag">Family Branches</span>
+                            </div>
+                        </div>
+                         <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h3>Expansion of the Kindred</h3>
+                                <p class="era">Modern Era (8th and 9th Generations)</p>
+                                <p>The eighth and ninth generations saw significant growth with numerous descendants spreading across Nigeria.</p>
+                                <span class="timeline-tag">Expansion</span>
+                            </div>
+                        </div>
+                         <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h3>Modern Descendants</h3>
+                                <p class="era">Contemporary Times (10th Generation)</p>
+                                <p>The tenth generation represents the modern descendants of the Odikpo kindred, carrying on the family legacy into contemporary times.</p>
+                                <span class="timeline-tag">10th Generation</span>
+                            </div>
+                        </div>
+                        </div>
+                </section>
+
+                <section id="gallery" class="content-section">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Family Gallery</h2>
+
+                    <div class="gallery-tabs">
+                        <button class="gallery-tab-button active" data-gallery-tab="member-photos">Member Photos</button>
+                        <button class="gallery-tab-button" data-gallery-tab="timeline-photos">Timeline</button>
+                        <button class="gallery-tab-button" data-gallery-tab="family-events">Family Events</button>
+                    </div>
+
+                    <div id="member-photos" class="gallery-content active">
+                         <div class="mb-4">
+                            <h3 class="text-lg font-medium mb-2 text-gray-600">Filter by Generation</h3>
+                            <div class="generation-filters flex flex-wrap gap-1" id="gallery-generation-filters">
+                                 <button class="generation-filter-button active">All</button>
+                                 <button class="generation-filter-button">1st Gen</button>
+                                 <button class="generation-filter-button">2nd Gen</button>
+                                 <button class="generation-filter-button">3rd Gen</button>
+                                 <button class="generation-filter-button">4th Gen</button>
+                                 <button class="generation-filter-button">5th Gen</button>
+                                 <button class="generation-filter-button">6th Gen</button>
+                                 <button class="generation-filter-button">7th Gen</button>
+                                 <button class="generation-filter-button">8th Gen</button>
+                                 <button class="generation-filter-button">9th Gen</button>
+                                 <button class="generation-filter-button">10th Gen</button>
+                                 <button class="generation-filter-button">11th Gen</button>
+                                 <button class="generation-filter-button">12th Gen</button>
+                                 <button class="generation-filter-button">13th Gen</button>
+                             </div>
+                         </div>
+                         <div class="gallery-grid">
+                             <div class="gallery-item">
+                                 <img src="https://placehold.co/150x150/e0e0e0/333?text=Member+1" alt="Member Photo 1">
+                                 <p>Member 1</p>
+                             </div>
+                              <div class="gallery-item">
+                                 <img src="https://placehold.co/150x150/e0e0e0/333?text=Member+2" alt="Member Photo 2">
+                                 <p>Member 2</p>
+                             </div>
+                              <div class="gallery-item">
+                                 <img src="https://placehold.co/150x150/e0e0e0/333?text=Member+3" alt="Member Photo 3">
+                                 <p>Member 3</p>
+                             </div>
+                              <div class="gallery-item">
+                                 <img src="https://placehold.co/150x150/e0e0e0/333?text=Member+4" alt="Member Photo 4">
+                                 <p>Member 4</p>
+                             </div>
+                              <div class="gallery-item">
+                                 <img src="https://placehold.co/150x150/e0e0e0/333?text=Member+5" alt="Member Photo 5">
+                                 <p>Member 5</p>
+                             </div>
+                              <div class="gallery-item">
+                                 <img src="https://placehold.co/150x150/e0e0e0/333?text=Member+6" alt="Member Photo 6">
+                                 <p>Member 6</p>
+                             </div>
+                             </div>
+                    </div>
+
+                    <div id="timeline-photos" class="gallery-content">
+                        <div class="gallery-placeholder">
+                            <p>No timeline photos available</p>
+                        </div>
+                    </div>
+
+                    <div id="family-events" class="gallery-content">
+                        <div class="gallery-placeholder">
+                            <p>Family event photos coming soon</p>
+                            <button>Upload Event Photos</button>
+                        </div>
+                    </div>
+
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6 mt-auto">
+        <div class="container text-center text-gray-400">
+            <p>&copy; 2023 Odikpo Family Tree. All rights reserved.</p>
+            </div>
+    </footer>
+
+    <div class="modal-overlay" id="member-details-modal">
+        <div class="modal-content">
+            <button class="modal-close-button" id="close-modal-button"><i class="fas fa-times"></i></button>
+            <img src="https://placehold.co/100x100/e0e0e0/333?text=Photo" alt="Member Photo" class="modal-member-photo" id="modal-member-photo">
+            <h3 id="modal-member-name">Member Name</h3>
+            <div class="modal-details">
+                <p><strong>Generation:</strong> <span id="modal-member-generation"></span></p>
+                <p><strong>Status:</strong> <span id="modal-member-status"></span></p>
+                <p><strong>Age:</strong> <span id="modal-member-age"></span></p>
+                <p><strong>Occupation:</strong> <span id="modal-member-occupation"></span></p>
+                <p><strong>Residence:</strong> <span id="modal-member-residence"></span></p>
+                <p><strong>Branch:</strong> <span id="modal-member-branch"></span></p>
+                 <p><strong>Date of Birth:</strong> <span id="modal-member-dob"></span></p>
+                 <p><strong>Date of Death:</strong> <span id="modal-member-dod"></span></p>
+                 <p><strong>Father:</strong> <span id="modal-member-father"></span></p>
+                 <p><strong>Spouse:</strong> <span id="modal-member-spouse"></span></p>
+                 <p><strong>Children:</strong> <span id="modal-member-children"></span></p>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const hamburgerButton = document.getElementById('hamburger-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mainContentArea = document.querySelector('.main-content-area'); // Get main content area
+
+            // Sidebar Control Elements
+            const sidebarSearchInput = document.getElementById('sidebar-search-input');
+            const branchFilterRadios = document.querySelectorAll('#branch-filters input[type="radio"]');
+            const sidebarGenerationFilterButtons = document.querySelectorAll('#sidebar-generation-filters .generation-filter-button');
+
+            // Family Stats Elements
+            const statTotalMembers = document.getElementById('stat-total-members');
+            const statGenerations = document.getElementById('stat-generations');
+            const statOldestMember = document.getElementById('stat-oldest-member');
+            const statNewestAddition = document.getElementById('stat-newest-addition');
+
+
+            // Modal Elements
+            const modalOverlay = document.getElementById('member-details-modal');
+            const closeModalButton = document.getElementById('close-modal-button');
+            const modalMemberPhoto = document.getElementById('modal-member-photo');
+            const modalMemberName = document.getElementById('modal-member-name');
+            const modalMemberGeneration = document.getElementById('modal-member-generation');
+            const modalMemberStatus = document.getElementById('modal-member-status');
+            const modalMemberAge = document.getElementById('modal-member-age');
+            const modalMemberOccupation = document.getElementById('modal-member-occupation');
+            const modalMemberResidence = document.getElementById('modal-member-residence');
+            const modalMemberBranch = document.getElementById('modal-member-branch');
+            const modalMemberDob = document.getElementById('modal-member-dob');
+            const modalMemberDod = document.getElementById('modal-member-dod');
+            const modalMemberFather = document.getElementById('modal-member-father'); // New modal element
+            const modalMemberSpouse = document.getElementById('modal-member-spouse'); // New modal element
+            const modalMemberChildren = document.getElementById('modal-member-children'); // New modal element
+
+
+            // Gallery Tab Elements
+            const galleryTabButtons = document.querySelectorAll('.gallery-tab-button');
+            const galleryContents = document.querySelectorAll('.gallery-content');
+            const galleryGenerationFilterButtons = document.querySelectorAll('#gallery-generation-filters .generation-filter-button');
+
+
+            // Members Page Elements
+            const membersSection = document.getElementById('members');
+            const membersGrid = membersSection ? membersSection.querySelector('.members-grid') : null; // Added null check
+            // viewDetailsButtons are now handled by event delegation on membersGrid
+            const membersGenerationFilterButtons = document.querySelectorAll('#members-generation-filters .generation-filter-button');
+
+
+            // View Toggle Buttons (Selecting all buttons with this class)
+            const viewToggleButtons = document.querySelectorAll('.view-toggle-button');
+
+
+            // Sample Member Data (Replace with actual data fetching in a real app)
+            const membersData = [
+                { id: 'onaga', name: 'Onaga', generation: '1st Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'N/A', spouse: 'N/A', children: ['Oluorhu', 'Okoji'] },
+                { id: 'oluorhu', name: 'Oluorhu', generation: '2nd Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Onaga', spouse: 'N/A', children: [] },
+                { id: 'okoji', name: 'Okoji', generation: '3rd Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Onaga', spouse: 'Onobianu', children: ['Okpalo'] },
+                 { id: 'onobianu', name: 'Onobianu', generation: '3rd Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'N/A', spouse: 'Okoji', children: ['Okpalo'] },
+                 { id: 'okpalo', name: 'Okpalo', generation: '4th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Okoji', spouse: 'N/A', children: ['Odikpo'] },
+                 { id: 'odikpo', name: 'Odikpo', generation: '5th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Okpalo', spouse: 'N/A', children: ['Nneuchendu', 'Oosikwe'] },
+                 { id: 'nneuchendu', name: 'Nneuchendu', generation: '6th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Odikpo', spouse: 'N/A', children: ['Chiedozie', 'Ikejiofor', 'Nwosu', 'Nneuchukwu'] },
+                 { id: 'oosikwe', name: 'Oosikwe', generation: '6th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Odikpo', spouse: 'N/A', children: ['Udenabo', 'Onyejeikwe', 'Akabogu', 'Nwezenagu'] },
+                 { id: 'chiedozie', name: 'Chiedozie', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Nneuchendu', spouse: 'N/A', children: [] },
+                 { id: 'udenabo', name: 'Udenabo', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Oosikwe', spouse: 'N/A', children: [] },
+                 { id: 'ikejiofor', name: 'Ikejiofor', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Nneuchendu', spouse: 'N/A', children: [] },
+                 { id: 'onyejeikwe', name: 'Onyejeikwe', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Oosikwe', spouse: 'N/A', children: [] },
+                 { id: 'nwosu', name: 'Nwosu', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Nneuchendu', spouse: 'N/A', children: [] },
+                 { id: 'akabogu', name: 'Akabogu', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Oosikwe', spouse: 'N/A', children: [] },
+                 { id: 'nneuchukwu', name: 'Nneuchukwu', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Nneuchendu', spouse: 'N/A', children: [] },
+                 { id: 'nwezenagu', name: 'Nwezenagu', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Oosikwe', spouse: 'N/A', children: [] },
+                // Add more member data here with different generations and branches, and parent/spouse/child info
+            ];
+
+
+            // Function to update the family stats based on filtered members
+            const updateFamilyStats = (filteredMembers) => {
+                statTotalMembers.textContent = filteredMembers.length;
+
+                // Calculate unique generations among filtered members
+                const uniqueGenerations = new Set(filteredMembers.map(member => member.generation));
+                statGenerations.textContent = uniqueGenerations.size;
+
+                // Update oldest/newest - currently placeholders
+                statOldestMember.textContent = 'N/A';
+                statNewestAddition.textContent = 'N/A';
+            };
+
+            // Function to render member cards
+            const renderMemberCards = (membersToDisplay) => {
+                if (!membersGrid) return; // Exit if membersGrid element doesn't exist
+
+                membersGrid.innerHTML = ''; // Clear current member cards
+
+                if (membersToDisplay.length === 0) {
+                     membersGrid.innerHTML = '<p class="text-center text-gray-500 col-span-full">No members found matching the filters.</p>';
+                     return;
+                }
+
+                membersToDisplay.forEach(member => {
+                    const memberCardHtml = `
+                        <div class="member-card" data-generation="${member.generation}" data-branch="${member.branch}" data-member-id="${member.id}">
+                            <img src="${member.photo}" alt="${member.name} Photo" class="member-photo">
+                            <h3 class="text-lg font-semibold mb-1">${member.name}</h3>
+                            <p class="text-sm text-gray-600">${member.generation}</p>
+                            <p class="text-sm text-gray-600">Status: ${member.status}</p>
+                            <p class="text-sm text-gray-600">Age: ${member.age}</p>
+                            <p class="text-sm text-gray-600">Occupation: ${member.occupation}</p>
+                            <p class="text-sm text-gray-600">Residence: ${member.residence}</p>
+                            <p class="text-sm text-gray-600">Father: ${member.father}</p>
+                            <p class="text-sm text-gray-600">Spouse: ${member.spouse}</p>
+                            <p class="text-sm text-gray-600 mb-3">Children: ${member.children.join(', ') || 'N/A'}</p>
+                            <button class="view-details-button text-blue-500 hover:underline text-sm" data-member-id="${member.id}">View details <i class="fas fa-arrow-right ml-1"></i></button>
+                        </div>
+                    `;
+                    membersGrid.innerHTML += memberCardHtml; // Append the new card
+                });
+            };
+
+
+            // Function to apply filters and update stats and displayed members
+            const applyFiltersAndUpdateDisplay = () => {
+                const searchTerm = sidebarSearchInput.value.toLowerCase();
+                const selectedBranch = document.querySelector('#branch-filters input[name="branch"]:checked').value;
+                const activeGenerationButton = document.querySelector('#sidebar-generation-filters .generation-filter-button.active');
+                const selectedGeneration = activeGenerationButton ? activeGenerationButton.textContent.trim().replace(' Gen', ' Generation') : 'All';
+
+                const filteredMembers = membersData.filter(member => {
+                    const matchesSearch = member.name.toLowerCase().includes(searchTerm) ||
+                                          member.occupation.toLowerCase().includes(searchTerm) ||
+                                          member.residence.toLowerCase().includes(searchTerm) ||
+                                          member.father.toLowerCase().includes(searchTerm) || // Include father in search
+                                          member.spouse.toLowerCase().includes(searchTerm) || // Include spouse in search
+                                          member.children.some(child => child.toLowerCase().includes(searchTerm)); // Search within children array
+
+
+                    const matchesBranch = selectedBranch === 'all' || member.branch.toLowerCase() === selectedBranch; // Case-insensitive branch match
+
+                    const matchesGeneration = selectedGeneration === 'All' || member.generation === selectedGeneration;
+
+                    return matchesSearch && matchesBranch && matchesGeneration;
+                });
+
+                updateFamilyStats(filteredMembers);
+                renderMemberCards(filteredMembers); // Render the filtered members
+            };
+
+
+            // Add event listeners to filter controls
+            sidebarSearchInput.addEventListener('input', applyFiltersAndUpdateDisplay);
+            branchFilterRadios.forEach(radio => {
+                radio.addEventListener('change', applyFiltersAndUpdateDisplay);
+            });
+            sidebarGenerationFilterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Update active class for sidebar generation filters
+                    sidebarGenerationFilterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    applyFiltersAndUpdateDisplay();
+                });
+            });
+
+
+            // Function to show a specific section and hide others
+            const showSection = (sectionId) => {
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                const activeSection = document.getElementById(sectionId);
+                if (activeSection) {
+                    activeSection.classList.add('active');
+                }
+
+                // Toggle sidebar visibility based on the active section
+                // Sidebar is visible only for 'tree-view' now that controls are moved there
+                if (sectionId === 'tree-view') {
+                    mainContentArea.classList.remove('hide-sidebar');
+                    // When showing Tree View, ensure filters are applied and stats are updated
+                    applyFiltersAndUpdateDisplay();
+                } else {
+                    mainContentArea.classList.add('hide-sidebar');
+                }
+
+                 // If navigating TO the members section, apply filters and display members
+                 if (sectionId === 'members') {
+                     applyFiltersAndUpdateDisplay();
+                 }
+
+                 // If navigating TO the gallery section, show the default tab
+                 if (sectionId === 'gallery') {
+                     const initialGalleryTabId = document.querySelector('.gallery-tabs .gallery-tab-button.active')?.getAttribute('data-gallery-tab') || 'member-photos';
+                     showGalleryTab(initialGalleryTabId);
+                 }
+            };
+
+            // Function to update active navigation link
+            const updateActiveLink = (activeSectionId) => {
+                // Update both desktop and mobile links
+                document.querySelectorAll('.nav-link').forEach(link => {
+                     if (link.getAttribute('data-section') === activeSectionId) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            };
+
+            // Function to close the mobile menu
+            const closeMobileMenu = () => {
+                mobileMenu.classList.remove('is-open');
+            };
+
+            // Function to open the modal with member details
+            const openModal = (memberId) => {
+                const member = membersData.find(m => m.id === memberId);
+                if (member) {
+                    // Populate modal with member data
+                    modalMemberPhoto.src = member.photo;
+                    modalMemberPhoto.alt = member.name + " Photo";
+                    modalMemberName.textContent = member.name;
+                    modalMemberGeneration.textContent = member.generation;
+                    modalMemberStatus.textContent = member.status;
+                    modalMemberAge.textContent = member.age;
+                    modalMemberOccupation.textContent = member.occupation;
+                    modalMemberResidence.textContent = member.residence;
+                    modalMemberBranch.textContent = member.branch;
+                    modalMemberDob.textContent = member.dob;
+                    modalMemberDod.textContent = member.dod;
+                    modalMemberFather.textContent = member.father; // Populate new field
+                    modalMemberSpouse.textContent = member.spouse; // Populate new field
+                    modalMemberChildren.textContent = member.children.join(', ') || 'N/A'; // Populate new field, handle empty array
+
+
+                    modalOverlay.classList.add('is-visible'); // Show the modal
+                } else {
+                    console.error("Member with ID", memberId, "not found.");
+                    // Optionally show an error message to the user
+                }
+            };
+
+            // Function to close the modal
+            const closeModal = () => {
+                modalOverlay.classList.remove('is-visible'); // Hide the modal
+            };
+
+             // Function to show a specific gallery tab content
+            const showGalleryTab = (tabId) => {
+                galleryContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                const activeContent = document.getElementById(tabId);
+                if (activeContent) {
+                    activeContent.classList.add('active');
+                }
+            };
+
+             // Function to update active gallery tab button
+             const updateActiveGalleryTabButton = (activeTabId) => {
+                 galleryTabButtons.forEach(button => {
+                     if (button.getAttribute('data-gallery-tab') === activeTabId) {
+                         button.classList.add('active');
+                     } else {
+                         button.classList.remove('active');
+                     }
+                 });
+             };
+
+             // Function to update active generation filter button (for Members and Gallery sections)
+             const updateActiveGenerationFilterButton = (activeFilterText, filterContainerId) => {
+                 const filterContainer = document.getElementById(filterContainerId);
+                 if (filterContainer) {
+                     filterContainer.querySelectorAll('.generation-filter-button').forEach(button => {
+                          if (button.textContent.trim() === activeFilterText || button.textContent.trim() === activeFilterText.replace(' Generation', ' Gen')) { // Handle both 'Generation' and 'Gen' text
+                              button.classList.add('active');
+                          } else {
+                              button.classList.remove('active');
+                          }
+                     });
+                 }
+             };
+
+
+             // Function to update active view toggle button
+             const updateActiveViewToggleButton = (activeView) => {
+                 viewToggleButtons.forEach(button => {
+                     if (button.getAttribute('data-view') === activeView) {
+                         button.classList.add('active');
+                     } else {
+                         button.classList.remove('active');
+                     }
+                 });
+             };
+
+
+            // Handle navigation link clicks
+            navLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent default anchor link behavior
+                    const sectionId = link.getAttribute('data-section');
+                    showSection(sectionId);
+                    updateActiveLink(sectionId);
+                    closeMobileMenu(); // Close menu on link click
+                    // Optionally update the URL hash without page reload
+                    history.pushState(null, '', `#${sectionId}`);
+                });
+            });
+
+            // Handle hamburger button click to toggle mobile menu
+            hamburgerButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('is-open');
+            });
+
+             // Handle "View details" button clicks (Delegation for dynamically added buttons)
+             // We use event delegation on the membersGrid since the buttons are inside member cards
+             // Check if membersGrid exists before adding listener (it's only on the members page)
+             if (membersGrid) {
+                 membersGrid.addEventListener('click', (event) => {
+                     const target = event.target;
+                     if (target.classList.contains('view-details-button') || target.closest('.view-details-button')) {
+                          const button = target.closest('.view-details-button');
+                          const memberId = button.getAttribute('data-member-id');
+                          openModal(memberId);
+                     }
+                 });
+             }
+
+
+            // Handle closing modal via button
+            closeModalButton.addEventListener('click', closeModal);
+
+            // Handle closing modal via clicking outside the content (overlay)
+            modalOverlay.addEventListener('click', (event) => {
+                if (event.target === modalOverlay) { // Check if the click was directly on the overlay
+                    closeModal();
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && modalOverlay.classList.contains('is-visible')) {
+                    closeModal();
+                }
+            });
+
+            // Handle gallery tab button clicks
+            galleryTabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-gallery-tab');
+                    showGalleryTab(tabId);
+                    updateActiveGalleryTabButton(tabId);
+                });
+            });
+
+             // Handle generation filter button clicks (Placeholder for actual filtering logic)
+             // This listener is now added to all generation filter buttons
+             document.querySelectorAll('.generation-filters .generation-filter-button').forEach(button => {
+                 button.addEventListener('click', () => {
+                      const filterText = button.textContent.trim();
+                      console.log("Filter by:", filterText); // Placeholder for filtering logic
+                      // Determine which filter container this button belongs to
+                      const filterContainer = button.closest('.generation-filters');
+                      if (filterContainer) {
+                           updateActiveGenerationFilterButton(filterText, filterContainer.id);
+                           // If the click is on a sidebar filter button, apply filters and update stats
+                           if (filterContainer.id === 'sidebar-generation-filters') {
+                                applyFiltersAndUpdateDisplay(); // Use the new display function
+                           }
+                           // TODO: Implement actual filtering of member cards/gallery items based on selected generation
+                      }
+                 });
+             });
+
+
+             // Handle view toggle button clicks (Placeholder for actual view switching logic)
+             viewToggleButtons.forEach(button => {
+                 button.addEventListener('click', () => {
+                      const view = button.getAttribute('data-view');
+                      console.log("Switching to view:", view); // Placeholder for view switching logic
+                      updateActiveViewToggleButton(view);
+                      // TODO: Implement actual switching between grid and list view classes on membersGrid
+                      if (membersGrid) { // Check if membersGrid exists before manipulating classes
+                           if (view === 'list') {
+                               membersGrid.classList.add('list-view');
+                               membersGrid.classList.remove('grid'); // Remove Tailwind grid classes
+                               membersGrid.classList.remove('grid-cols-1', 'sm:grid-cols-2', 'lg:grid-cols-3', 'gap-4'); // Remove specific grid classes
+                           } else { // grid view
+                                membersGrid.classList.remove('list-view');
+                                membersGrid.classList.add('grid'); // Add Tailwind grid classes back
+                                membersGrid.classList.add('grid-cols-1', 'sm:grid-cols-2', 'lg:grid-cols-3', 'gap-4'); // Add specific grid classes back
+                           }
+                      }
+                 });
+             });
+
+
+            // Show the initial section based on the URL hash or default to tree-view
+            const initialSectionId = window.location.hash ? window.location.hash.substring(1) : 'tree-view';
+            showSection(initialSectionId);
+            updateActiveLink(initialSectionId);
+
+             // Handle browser back/forward buttons
+             window.addEventListener('popstate', () => {
+                 const sectionId = window.location.hash ? window.location.hash.substring(1) : 'tree-view';
+                 showSection(sectionId);
+                 updateActiveLink(sectionId);
+                 closeMobileMenu(); // Close menu on back/forward
+             });
+
+             // Close mobile menu if window is resized to desktop size
+             window.addEventListener('resize', () => {
+                 if (window.innerWidth >= 768) { // 768px is Tailwind's 'md' breakpoint
+                     closeMobileMenu();
+                 }
+             });
+
+             // Show the initial gallery tab content when the gallery section is active
+             // This is a basic approach; a more robust solution would handle this when navigating *to* the gallery section
+             const initialGalleryTabId = document.querySelector('.gallery-tabs .gallery-tab-button.active')?.getAttribute('data-gallery-tab') || 'member-photos';
+             showGalleryTab(initialGalleryTabId);
+
+             // Set initial active generation filter button (for all sections with the filter)
+             document.querySelectorAll('.generation-filters .generation-filter-button').forEach(button => {
+                  if (button.textContent.trim() === 'All') {
+                      button.classList.add('active');
+                  } else {
+                      button.classList.remove('active');
+                  }
+             });
+
+
+             // Set initial active view toggle button (only for Members section)
+             if (membersSection && membersSection.classList.contains('active')) { // Added null check for membersSection
+                 updateActiveViewToggleButton('grid');
+             }
+
+             // Initial update of family stats and display on page load
+             applyFiltersAndUpdateDisplay();
+
+
+        });
+    </script>
+
+</body>
+</html>
