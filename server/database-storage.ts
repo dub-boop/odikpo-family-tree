@@ -44,7 +44,7 @@ import {
       const results = await db
         .insert(familyMembers)
         .values(memberData)
-        .returning();
+        .returning() as FamilyMember[];
       
       return results[0];
     }
@@ -57,7 +57,7 @@ import {
         .update(familyMembers)
         .set(memberData)
         .where(eq(familyMembers.id, id))
-        .returning();
+        .returning() as FamilyMember[];
       
       return results.length > 0 ? results[0] : undefined;
     }
@@ -70,7 +70,7 @@ import {
         .where(eq(familyMembers.parentId, id));
       
       // Delete children recursively
-      for (const child of childrenToDelete) {
+      for (const child of childrenToDelete as FamilyMember[]) {
         await this.deleteFamilyMember(child.id);
       }
       
@@ -78,7 +78,7 @@ import {
       const results = await db
         .delete(familyMembers)
         .where(eq(familyMembers.id, id))
-        .returning();
+        .returning() as FamilyMember[];
       
       return results.length > 0;
     }

@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import { Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertFamilyMemberSchema } from "@shared/schema";
@@ -6,7 +7,7 @@ import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all family members
-  app.get("/api/family-members", async (req, res) => {
+  app.get("/api/family-members", async (req: Request, res: Response) => {
     try {
       const members = await storage.getAllFamilyMembers();
       res.json(members);
@@ -16,7 +17,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get a single family member by ID
-  app.get("/api/family-members/:id", async (req, res) => {
+  app.get("/api/family-members/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
@@ -35,7 +36,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get family members by generation
-  app.get("/api/family-members/generation/:generation", async (req, res) => {
+  app.get("/api/family-members/generation/:generation", async (req: Request, res: Response) => {
     try {
       const generation = parseInt(req.params.generation);
       if (isNaN(generation)) {
@@ -50,7 +51,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get family members by branch
-  app.get("/api/family-members/branch/:branch", async (req, res) => {
+  app.get("/api/family-members/branch/:branch", async (req: Request, res: Response) => {
     try {
       const branch = req.params.branch;
       const members = await storage.getFamilyMembersByBranch(branch);
@@ -61,7 +62,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a new family member
-  app.post("/api/family-members", async (req, res) => {
+  app.post("/api/family-members", async (req: Request, res: Response) => {
     try {
       const memberData = insertFamilyMemberSchema.parse(req.body);
       const newMember = await storage.createFamilyMember(memberData);
@@ -75,7 +76,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update an existing family member
-  app.put("/api/family-members/:id", async (req, res) => {
+  app.put("/api/family-members/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
@@ -99,7 +100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete a family member
-  app.delete("/api/family-members/:id", async (req, res) => {
+  app.delete("/api/family-members/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {

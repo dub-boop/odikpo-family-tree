@@ -13,6 +13,7 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "types": ["node"],
+    "typeRoots": ["node_modules/@types"],
     "paths": {
       "@/*": ["./client/src/*"],
       "@shared/*": ["./shared/*"]
