@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In - Odikpo Family Tree</title>
+    <title>Admin Login - Odikpo Family Tree</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -48,8 +48,7 @@
             width: auto; /* Maintain aspect ratio */
         }
 
-
-        .login-container {
+        .admin-login-container {
             background-color: #ffffff;
             padding: 2.5rem;
             border-radius: 0.75rem; /* rounded-xl */
@@ -63,17 +62,11 @@
             margin-top: 6rem; /* Adjust based on header height */
         }
 
-        .title {
+        .admin-login-container h2 {
             font-size: 1.5rem;
             font-weight: bold;
             color: #333;
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-            font-size: 1rem;
-            color: #6b7280;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .input-field {
@@ -101,22 +94,6 @@
         .login-button:hover {
             background-color: #8b5cf6; /* Darker purple on hover */
         }
-
-        /* Style for the Admin Login Link */
-        .admin-login-link {
-            display: block; /* Make it a block element for margin */
-            margin-top: 1rem; /* Space above the link */
-            font-size: 0.875rem; /* text-sm */
-            color: #3b82f6; /* Blue color */
-            text-decoration: none; /* Remove underline */
-            transition: color 0.2s ease-in-out;
-        }
-
-        .admin-login-link:hover {
-            color: #2563eb; /* Darker blue on hover */
-            text-decoration: underline; /* Add underline on hover */
-        }
-
 
         /* Abstract Figures - Using simple divs with background colors */
         .figure {
@@ -166,19 +143,13 @@
         </div>
     </header>
 
-
-    <div class="login-container">
-        <div class="title">THE ODIKPO KINDRED</div>
-        <div class="subtitle">A FAMILY TREE</div>
-
-        <form id="login-form">
-            <input type="text" id="username" class="input-field" placeholder="Username" required>
-
-            <input type="text" id="unique-id" class="input-field" placeholder="Input your unique ID" required>
+    <div class="admin-login-container">
+        <h2>Admin Login</h2>
+        <form id="admin-login-form">
+            <input type="text" id="admin-username" class="input-field" placeholder="Username" required>
+            <input type="password" id="admin-password" class="input-field" placeholder="Password" required>
             <button type="submit" class="login-button">Login</button>
         </form>
-
-        <a href="#" id="admin-login-link" class="admin-login-link">Admin Login</a>
     </div>
 
     <div class="figure figure-left"></div>
@@ -187,52 +158,35 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const loginForm = document.getElementById('login-form');
-            const usernameInput = document.getElementById('username'); // Get the new username input
-            const uniqueIdInput = document.getElementById('unique-id');
-            const adminLoginLink = document.getElementById('admin-login-link');
+            const adminLoginForm = document.getElementById('admin-login-form');
+            const adminUsernameInput = document.getElementById('admin-username');
+            const adminPasswordInput = document.getElementById('admin-password');
 
 
-            if (loginForm) {
-                loginForm.addEventListener('submit', (event) => {
+            if (adminLoginForm) {
+                adminLoginForm.addEventListener('submit', (event) => {
                     event.preventDefault(); // Prevent default form submission
 
-                    const username = usernameInput.value.trim(); // Get username value
-                    const uniqueId = uniqueIdInput.value.trim();
+                    const username = adminUsernameInput.value.trim();
+                    const password = adminPasswordInput.value.trim();
 
-                    if (username && uniqueId) { // Require both fields
+                    if (username && password) {
                         // In a real application, you would send these credentials to a backend
                         // for validation and authentication.
-                        console.log("Attempting user login with Username:", username, "and ID:", uniqueId);
+                        console.log("Attempting admin login with Username:", username, "and Password:", password);
 
-                        // Placeholder for successful user login: Redirect to the main family tree page
-                        // window.location.href = 'index.html#tree-view'; // Assuming your main page is index.html
+                        // Placeholder for successful admin login: Redirect to the admin panel
+                        window.location.href = 'index.html#admin-panel'; // Assuming admin panel is a section on index.html
 
-                        alert(`User login simulated for Username: ${username} and ID: ${uniqueId}. (Authentication not implemented)`);
+                        alert(`Admin login simulated for Username: ${username}. (Authentication not implemented)`);
 
                         // Clear the input fields after simulation
-                        usernameInput.value = '';
-                        uniqueIdInput.value = '';
+                        adminUsernameInput.value = '';
+                        adminPasswordInput.value = '';
 
                     } else {
-                        alert("Please enter both username and unique ID.");
+                        alert("Please enter both username and password.");
                     }
-                });
-            }
-
-            // Handle Admin Login link click
-            if (adminLoginLink) {
-                adminLoginLink.addEventListener('click', (event) => {
-                    event.preventDefault(); // Prevent default link behavior
-
-                    console.log("Admin login link clicked.");
-
-                    // Placeholder for admin login: Redirect to an admin login page or show a modal
-                    // For now, just show an alert
-                    alert("Admin Login clicked. (Admin login functionality not implemented)");
-
-                    // In a real application, you would redirect to a dedicated admin login page:
-                    window.location.href = 'admin_login.html'; // Example admin login page URL
                 });
             }
         });

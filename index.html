@@ -26,8 +26,6 @@
             display: flex;
             flex-direction: column; /* Default to column on small screens */
             gap: 1.5rem;
-            margin-left: 2.5rem;
-            margin-right: 2.5rem;
         }
 
         @media (min-width: 768px) {
@@ -112,10 +110,11 @@
 
         /* Mobile menu container */
         .mobile-menu {
-            position: absolute; /* Position relative to nearest positioned ancestor (header) */
-            top: 100%; /* Position below the header */
+            position: fixed; /* Use fixed position to overlay content */
+            top: 0; /* Will be adjusted by JS based on header height */
             left: 0;
             right: 0;
+            bottom: 0; /* Extend to the bottom */
             background-color: #ffffff; /* White background */
             border-bottom: 1px solid #ccc;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -124,6 +123,7 @@
             display: none; /* Hidden by default */
             flex-direction: column;
             gap: 0.5rem;
+            overflow-y: auto; /* Add scroll if content is too long */
         }
 
         .mobile-menu.is-open {
@@ -502,12 +502,130 @@
 
         /* --- End Members Page Specific Styles --- */
 
+        /* --- Admin Panel Styles --- */
+        .admin-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: medium;
+            color: #4b5563;
+        }
+
+        .admin-form input[type="text"],
+        .admin-form input[type="password"],
+        .admin-form textarea,
+        .admin-form select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .admin-form button {
+            padding: 0.75rem 1.5rem;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 0.375rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .admin-form button:hover {
+            background-color: #2563eb;
+        }
+
+        .admin-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+
+        .admin-section h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .admin-member-list-controls {
+             display: flex;
+             flex-direction: column;
+             gap: 1rem;
+             margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .admin-member-list-controls {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .admin-member-list-controls input[type="text"] {
+             flex-grow: 1; /* Allow search input to take available space */
+        }
+
+
+        .member-list-admin {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .member-list-admin-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+        }
+
+        .member-list-admin-item span {
+            flex-grow: 1;
+            margin-right: 1rem;
+            word-break: break-all; /* Prevent long IDs from overflowing */
+        }
+
+        .member-list-admin-item .actions button {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+        }
+
+        .member-list-admin-item .actions .edit-button {
+             background-color: #fcd34d; /* Yellow */
+             color: #333;
+        }
+
+         .member-list-admin-item .actions .edit-button:hover {
+             background-color: #fbbf24; /* Darker yellow */
+         }
+
+         .member-list-admin-item .actions .delete-button {
+             background-color: #f87171; /* Red */
+             color: white;
+         }
+
+         .member-list-admin-item .actions .delete-button:hover {
+             background-color: #ef4444; /* Darker red */
+         }
+
+
+        /* --- End Admin Panel Styles --- */
+
 
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <header class="bg-gray-100 py-4 border-b border-gray-300 shadow-sm relative">
+    <header id="app-header" class="bg-gray-100 py-4 border-b border-gray-300 shadow-sm relative">
         <div class="container flex items-center justify-between">
             <div class="text-2xl font-bold text-gray-800">Odikpo Family Tree</div>
 
@@ -516,6 +634,7 @@
                 <a href="#members" class="nav-link" data-section="members">Members</a>
                 <a href="#history" class="nav-link" data-section="history">History</a>
                 <a href="#gallery" class="nav-link" data-section="gallery">Gallery</a>
+                <a href="#admin-panel" class="nav-link" data-section="admin-panel">Admin Panel</a>
             </nav>
 
             <button class="hamburger-button md:hidden" id="hamburger-button">
@@ -523,14 +642,15 @@
              </button>
 
             </div>
-
-        <div class="mobile-menu md:hidden" id="mobile-menu">
-             <a href="#tree-view" class="nav-link" data-section="tree-view">Tree View</a>
-             <a href="#members" class="nav-link" data-section="members">Members</a>
-             <a href="#history" class="nav-link" data-section="history">History</a>
-             <a href="#gallery" class="nav-link" data-section="gallery">Gallery</a>
-        </div>
     </header>
+
+    <div class="mobile-menu md:hidden" id="mobile-menu">
+         <a href="#tree-view" class="nav-link" data-section="tree-view">Tree View</a>
+         <a href="#members" class="nav-link" data-section="members">Members</a>
+         <a href="#history" class="nav-link" data-section="history">History</a>
+         <a href="#gallery" class="nav-link" data-section="gallery">Gallery</a>
+         <a href="#admin-panel" class="nav-link" data-section="admin-panel">Admin Panel</a>
+    </div>
 
     <main class="container py-6 flex-grow">
         <div class="main-content-area">
@@ -784,6 +904,80 @@
 
                 </section>
 
+                <section id="admin-panel" class="content-section">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Admin Panel</h2>
+
+                    <div class="admin-section">
+                        <h3>Add New Member</h3>
+                        <form id="add-member-form" class="admin-form">
+                            <label for="member-name">Name:</label>
+                            <input type="text" id="member-name" required>
+
+                            <label for="member-generation">Generation:</label>
+                            <input type="text" id="member-generation">
+
+                            <label for="member-branch">Branch:</label>
+                            <input type="text" id="member-branch">
+
+                            <label for="member-father-id">Father's ID:</label>
+                            <input type="text" id="member-father-id" placeholder="Enter Father's existing ID">
+
+                            <label for="member-father-name">Father (Name - for display):</label>
+                            <input type="text" id="member-father-name" placeholder="Enter Father's name">
+
+
+                            <label for="member-spouse">Spouse (ID or Name):</label>
+                            <input type="text" id="member-spouse">
+
+                            <label for="member-children">Children (Comma-separated IDs or Names):</label>
+                            <input type="text" id="member-children">
+
+                            <label for="member-status">Status:</label>
+                            <input type="text" id="member-status">
+
+                            <label for="member-age">Age:</label>
+                            <input type="text" id="member-age">
+
+                            <label for="member-occupation">Occupation:</label>
+                            <input type="text" id="member-occupation">
+
+                            <label for="member-residence">Residence:</label>
+                            <input type="text" id="member-residence">
+
+                            <label for="member-dob">Date of Birth:</label>
+                            <input type="text" id="member-dob">
+
+                            <label for="member-dod">Date of Death:</label>
+                            <input type="text" id="member-dod">
+
+                            <label for="member-photo">Photo URL:</label>
+                            <input type="text" id="member-photo">
+
+                            <button type="submit">Add Member</button>
+                        </form>
+                    </div>
+
+                    <div class="admin-section">
+                        <h3>Manage Members</h3>
+                        <p class="text-gray-600 mb-4">List of existing members with options to edit or delete.</p>
+                        <div class="admin-member-list-controls">
+                             <input type="text" id="admin-member-search-input" placeholder="Search members..." class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                             </div>
+                        <div id="admin-member-list" class="member-list-admin">
+                            <p class="text-center text-gray-500">Loading members...</p>
+                        </div>
+                    </div>
+
+
+                    <div class="admin-section">
+                        <h3>Edit Page Content (Placeholder)</h3>
+                        <p class="text-gray-600">This section would allow editing the content of pages like History, Gallery descriptions, etc.</p>
+                        <textarea rows="10" placeholder="Select a page to edit..." class="w-full p-2 border rounded-md mb-4"></textarea>
+                        <button disabled class="bg-gray-400 text-white font-bold py-2 px-4 rounded-md cursor-not-allowed">Save Page Content</button>
+                    </div>
+
+                </section>
+
             </div>
         </div>
     </main>
@@ -823,6 +1017,8 @@
             const hamburgerButton = document.getElementById('hamburger-button');
             const mobileMenu = document.getElementById('mobile-menu');
             const mainContentArea = document.querySelector('.main-content-area'); // Get main content area
+            const appHeader = document.getElementById('app-header'); // Get the header element
+
 
             // Sidebar Control Elements
             const sidebarSearchInput = document.getElementById('sidebar-search-input');
@@ -866,29 +1062,38 @@
             // viewDetailsButtons are now handled by event delegation on membersGrid
             const membersGenerationFilterButtons = document.querySelectorAll('#members-generation-filters .generation-filter-button');
 
+            // Admin Panel Elements
+            const adminPanelSection = document.getElementById('admin-panel');
+            const addMemberForm = document.getElementById('add-member-form');
+            const adminMemberList = document.getElementById('admin-member-list');
+            const memberFatherIdInput = document.getElementById('member-father-id'); // New input for Father's ID
+            const memberFatherNameInput = document.getElementById('member-father-name'); // Input for Father's Name
+            const adminMemberSearchInput = document.getElementById('admin-member-search-input'); // New Admin Search Input
+
 
             // View Toggle Buttons (Selecting all buttons with this class)
             const viewToggleButtons = document.querySelectorAll('.view-toggle-button');
 
 
             // Sample Member Data (Replace with actual data fetching in a real app)
+            // Added fatherId to the data structure
             const membersData = [
-                { id: 'onaga', name: 'Onaga', generation: '1st Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'N/A', spouse: 'N/A', children: ['Oluorhu', 'Okoji'] },
-                { id: 'oluorhu', name: 'Oluorhu', generation: '2nd Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Onaga', spouse: 'N/A', children: [] },
-                { id: 'okoji', name: 'Okoji', generation: '3rd Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Onaga', spouse: 'Onobianu', children: ['Okpalo'] },
-                 { id: 'onobianu', name: 'Onobianu', generation: '3rd Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'N/A', spouse: 'Okoji', children: ['Okpalo'] },
-                 { id: 'okpalo', name: 'Okpalo', generation: '4th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Okoji', spouse: 'N/A', children: ['Odikpo'] },
-                 { id: 'odikpo', name: 'Odikpo', generation: '5th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Okpalo', spouse: 'N/A', children: ['Nneuchendu', 'Oosikwe'] },
-                 { id: 'nneuchendu', name: 'Nneuchendu', generation: '6th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Odikpo', spouse: 'N/A', children: ['Chiedozie', 'Ikejiofor', 'Nwosu', 'Nneuchukwu'] },
-                 { id: 'oosikwe', name: 'Oosikwe', generation: '6th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Odikpo', spouse: 'N/A', children: ['Udenabo', 'Onyejeikwe', 'Akabogu', 'Nwezenagu'] },
-                 { id: 'chiedozie', name: 'Chiedozie', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Nneuchendu', spouse: 'N/A', children: [] },
-                 { id: 'udenabo', name: 'Udenabo', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Oosikwe', spouse: 'N/A', children: [] },
-                 { id: 'ikejiofor', name: 'Ikejiofor', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Nneuchendu', spouse: 'N/A', children: [] },
-                 { id: 'onyejeikwe', name: 'Onyejeikwe', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Oosikwe', spouse: 'N/A', children: [] },
-                 { id: 'nwosu', name: 'Nwosu', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Nneuchendu', spouse: 'N/A', children: [] },
-                 { id: 'akabogu', name: 'Akabogu', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Oosikwe', spouse: 'N/A', children: [] },
-                 { id: 'nneuchukwu', name: 'Nneuchukwu', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Nneuchendu', spouse: 'N/A', children: [] },
-                 { id: 'nwezenagu', name: 'Nwezenagu', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Oosikwe', spouse: 'N/A', children: [] },
+                { id: 'onaga', name: 'Onaga', generation: '1st Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'N/A', fatherId: null, spouse: 'N/A', children: ['Oluorhu', 'Okoji'] },
+                { id: 'oluorhu', name: 'Oluorhu', generation: '2nd Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Onaga', fatherId: 'onaga', spouse: 'N/A', children: [] },
+                { id: 'okoji', name: 'Okoji', generation: '3rd Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Onaga', fatherId: 'onaga', spouse: 'Onobianu', children: ['Okpalo'] },
+                 { id: 'onobianu', name: 'Onobianu', generation: '3rd Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'N/A', fatherId: null, spouse: 'Okoji', children: ['Okpalo'] },
+                 { id: 'okpalo', name: 'Okpalo', generation: '4th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Okoji', fatherId: 'okoji', spouse: 'N/A', children: ['Odikpo'] },
+                 { id: 'odikpo', name: 'Odikpo', generation: '5th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'N/A', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Okpalo', fatherId: 'okpalo', spouse: 'N/A', children: ['Nneuchendu', 'Oosikwe'] },
+                 { id: 'nneuchendu', name: 'Nneuchendu', generation: '6th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Odikpo', fatherId: 'odikpo', spouse: 'N/A', children: ['Chiedozie', 'Ikejiofor', 'Nwosu', 'Nneuchukwu'] },
+                 { id: 'oosikwe', name: 'Oosikwe', generation: '6th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Odikpo', fatherId: 'odikpo', spouse: 'N/A', children: ['Udenabo', 'Onyejeikwe', 'Akabogu', 'Nwezenagu'] },
+                 { id: 'chiedozie', name: 'Chiedozie', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Nneuchendu', fatherId: 'nneuchendu', spouse: 'N/A', children: [] },
+                 { id: 'udenabo', name: 'Udenabo', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Oosikwe', fatherId: 'oosikwe', spouse: 'N/A', children: [] },
+                 { id: 'ikejiofor', name: 'Ikejiofor', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Nneuchendu', fatherId: 'nneuchendu', spouse: 'N/A', children: [] },
+                 { id: 'onyejeikwe', name: 'Onyejeikwe', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Oosikwe', fatherId: 'oosikwe', spouse: 'N/A', children: [] },
+                 { id: 'nwosu', name: 'Nwosu', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Nneuchendu', fatherId: 'nneuchendu', spouse: 'N/A', children: [] },
+                 { id: 'akabogu', name: 'Akabogu', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Oosikwe', fatherId: 'oosikwe', spouse: 'N/A', children: [] },
+                 { id: 'nneuchukwu', name: 'Nneuchukwu', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Nwuchendu', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Nneuchendu', fatherId: 'nneuchendu', spouse: 'N/A', children: [] },
+                 { id: 'nwezenagu', name: 'Nwezenagu', generation: '7th Generation', status: 'Present', age: 'Unknown', occupation: 'Traditional Leader', residence: 'Eastern Nigeria', branch: 'Osekwe', dob: 'Unknown', dod: 'Unknown', photo: 'https://placehold.co/80x80/e0e0e0/333?text=Photo', father: 'Oosikwe', fatherId: 'oosikwe', spouse: 'N/A', children: [] },
                 // Add more member data here with different generations and branches, and parent/spouse/child info
             ];
 
@@ -906,7 +1111,13 @@
                 statNewestAddition.textContent = 'N/A';
             };
 
-            // Function to render member cards
+            // Helper function to find a member by ID
+            const findMemberById = (id) => {
+                return membersData.find(member => member.id === id);
+            };
+
+
+            // Function to render member cards for the main Members section
             const renderMemberCards = (membersToDisplay) => {
                 if (!membersGrid) return; // Exit if membersGrid element doesn't exist
 
@@ -918,16 +1129,20 @@
                 }
 
                 membersToDisplay.forEach(member => {
+                     // Look up father's name using fatherId
+                    const father = member.fatherId ? findMemberById(member.fatherId) : null;
+                    const fatherName = father ? father.name : (member.father || 'N/A'); // Use fatherId lookup first, then father name field
+
                     const memberCardHtml = `
                         <div class="member-card" data-generation="${member.generation}" data-branch="${member.branch}" data-member-id="${member.id}">
-                            <img src="${member.photo}" alt="${member.name} Photo" class="member-photo">
+                            <img src="${member.photo}" onerror="this.onerror=null; this.src='https://placehold.co/80x80/e0e0e0/333?text=Photo';" alt="${member.name} Photo" class="member-photo">
                             <h3 class="text-lg font-semibold mb-1">${member.name}</h3>
                             <p class="text-sm text-gray-600">${member.generation}</p>
                             <p class="text-sm text-gray-600">Status: ${member.status}</p>
                             <p class="text-sm text-gray-600">Age: ${member.age}</p>
                             <p class="text-sm text-gray-600">Occupation: ${member.occupation}</p>
                             <p class="text-sm text-gray-600">Residence: ${member.residence}</p>
-                            <p class="text-sm text-gray-600">Father: ${member.father}</p>
+                            <p class="text-sm text-gray-600">Father: ${fatherName}</p>
                             <p class="text-sm text-gray-600">Spouse: ${member.spouse}</p>
                             <p class="text-sm text-gray-600 mb-3">Children: ${member.children.join(', ') || 'N/A'}</p>
                             <button class="view-details-button text-blue-500 hover:underline text-sm" data-member-id="${member.id}">View details <i class="fas fa-arrow-right ml-1"></i></button>
@@ -937,10 +1152,45 @@
                 });
             };
 
+            // Function to render member list for the Admin Panel
+            const renderAdminMemberList = (membersToDisplay) => {
+                if (!adminMemberList) return; // Exit if adminMemberList element doesn't exist
+
+                adminMemberList.innerHTML = ''; // Clear current list
+
+                if (membersToDisplay.length === 0) {
+                     adminMemberList.innerHTML = '<p class="text-center text-gray-500">No members found.</p>';
+                     return;
+                }
+
+                membersToDisplay.forEach(member => {
+                    const listItemHtml = `
+                        <div class="member-list-admin-item" data-member-id="${member.id}">
+                            <span>${member.name} (${member.generation}) - ID: ${member.id}</span>
+                            <div class="actions">
+                                <button class="edit-button bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-1 px-2 rounded-md text-xs">Edit</button>
+                                <button class="delete-button bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded-md text-xs">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                    adminMemberList.innerHTML += listItemHtml;
+                });
+            };
+
 
             // Function to apply filters and update stats and displayed members
             const applyFiltersAndUpdateDisplay = () => {
-                const searchTerm = sidebarSearchInput.value.toLowerCase();
+                // Determine which search input to use based on the active section
+                let currentSearchInput = null;
+                if (adminPanelSection && adminPanelSection.classList.contains('active')) {
+                    currentSearchInput = adminMemberSearchInput;
+                } else {
+                    currentSearchInput = sidebarSearchInput;
+                }
+
+                const searchTerm = currentSearchInput ? currentSearchInput.value.toLowerCase() : '';
+
+
                 const selectedBranch = document.querySelector('#branch-filters input[name="branch"]:checked').value;
                 const activeGenerationButton = document.querySelector('#sidebar-generation-filters .generation-filter-button.active');
                 const selectedGeneration = activeGenerationButton ? activeGenerationButton.textContent.trim().replace(' Gen', ' Generation') : 'All';
@@ -949,12 +1199,14 @@
                     const matchesSearch = member.name.toLowerCase().includes(searchTerm) ||
                                           member.occupation.toLowerCase().includes(searchTerm) ||
                                           member.residence.toLowerCase().includes(searchTerm) ||
-                                          member.father.toLowerCase().includes(searchTerm) || // Include father in search
-                                          member.spouse.toLowerCase().includes(searchTerm) || // Include spouse in search
-                                          member.children.some(child => child.toLowerCase().includes(searchTerm)); // Search within children array
+                                          (member.father && member.father.toLowerCase().includes(searchTerm)) || // Include father name in search
+                                          (member.spouse && member.spouse.toLowerCase().includes(searchTerm)) || // Include spouse name in search
+                                          (member.children && member.children.some(child => child.toLowerCase().includes(searchTerm))) || // Search within children array
+                                          (member.id && member.id.toLowerCase().includes(searchTerm)) || // Search by ID
+                                          (member.fatherId && member.fatherId.toLowerCase().includes(searchTerm)); // Search by Father's ID
 
 
-                    const matchesBranch = selectedBranch === 'all' || member.branch.toLowerCase() === selectedBranch; // Case-insensitive branch match
+                    const matchesBranch = selectedBranch === 'all' || (member.branch && member.branch.toLowerCase() === selectedBranch); // Case-insensitive branch match
 
                     const matchesGeneration = selectedGeneration === 'All' || member.generation === selectedGeneration;
 
@@ -962,7 +1214,14 @@
                 });
 
                 updateFamilyStats(filteredMembers);
-                renderMemberCards(filteredMembers); // Render the filtered members
+
+                // Only render member cards/list if the relevant section is active
+                if (membersSection && membersSection.classList.contains('active')) {
+                    renderMemberCards(filteredMembers);
+                } else if (adminPanelSection && adminPanelSection.classList.contains('active')) {
+                     renderAdminMemberList(filteredMembers);
+                }
+
             };
 
 
@@ -979,6 +1238,11 @@
                     applyFiltersAndUpdateDisplay();
                 });
             });
+
+            // Add event listener for the new Admin Member Search Input
+            if (adminMemberSearchInput) {
+                 adminMemberSearchInput.addEventListener('input', applyFiltersAndUpdateDisplay);
+            }
 
 
             // Function to show a specific section and hide others
@@ -1001,8 +1265,8 @@
                     mainContentArea.classList.add('hide-sidebar');
                 }
 
-                 // If navigating TO the members section, apply filters and display members
-                 if (sectionId === 'members') {
+                 // If navigating TO the members or admin-panel section, apply filters and display members/list
+                 if (sectionId === 'members' || sectionId === 'admin-panel') {
                      applyFiltersAndUpdateDisplay();
                  }
 
@@ -1028,12 +1292,19 @@
             // Function to close the mobile menu
             const closeMobileMenu = () => {
                 mobileMenu.classList.remove('is-open');
+                 // Restore scrolling on body when menu is closed
+                document.body.style.overflow = '';
             };
 
             // Function to open the modal with member details
             const openModal = (memberId) => {
                 const member = membersData.find(m => m.id === memberId);
                 if (member) {
+                     // Look up father's name using fatherId for the modal
+                    const father = member.fatherId ? findMemberById(member.fatherId) : null;
+                    const fatherName = father ? father.name : (member.father || 'N/A'); // Use fatherId lookup first, then father name field
+
+
                     // Populate modal with member data
                     modalMemberPhoto.src = member.photo;
                     modalMemberPhoto.alt = member.name + " Photo";
@@ -1046,7 +1317,7 @@
                     modalMemberBranch.textContent = member.branch;
                     modalMemberDob.textContent = member.dob;
                     modalMemberDod.textContent = member.dod;
-                    modalMemberFather.textContent = member.father; // Populate new field
+                    modalMemberFather.textContent = fatherName; // Populate father name using lookup
                     modalMemberSpouse.textContent = member.spouse; // Populate new field
                     modalMemberChildren.textContent = member.children.join(', ') || 'N/A'; // Populate new field, handle empty array
 
@@ -1111,106 +1382,82 @@
                  });
              };
 
+            // Handle Add Member form submission (basic example)
+            if (addMemberForm) {
+                addMemberForm.addEventListener('submit', (event) => {
+                    event.preventDefault(); // Prevent actual form submission
 
-            // Handle navigation link clicks
-            navLinks.forEach(link => {
-                link.addEventListener('click', (event) => {
-                    event.preventDefault(); // Prevent default anchor link behavior
-                    const sectionId = link.getAttribute('data-section');
-                    showSection(sectionId);
-                    updateActiveLink(sectionId);
-                    closeMobileMenu(); // Close menu on link click
-                    // Optionally update the URL hash without page reload
-                    history.pushState(null, '', `#${sectionId}`);
+                    // Get form values
+                    const fatherId = memberFatherIdInput.value.trim();
+                    const fatherName = memberFatherNameInput.value.trim(); // Get father name input
+
+                    // In a real application, you would validate the fatherId exists before creating the member.
+                    // For this demo, we'll just capture the ID.
+
+                    const newMember = {
+                        // Simple ID generation - In a real app, this might be generated on the backend
+                        id: document.getElementById('member-name').value.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(), // Added timestamp for basic uniqueness
+                        name: document.getElementById('member-name').value,
+                        generation: document.getElementById('member-generation').value,
+                        branch: document.getElementById('member-branch').value,
+                        father: fatherName, // Store father's name for display fallback
+                        fatherId: fatherId || null, // Store father's ID, or null if not provided
+                        spouse: document.getElementById('member-spouse').value,
+                        children: document.getElementById('member-children').value.split(',').map(child => child.trim()).filter(child => child !== ''), // Split children by comma
+                        status: document.getElementById('member-status').value,
+                        age: document.getElementById('member-age').value,
+                        occupation: document.getElementById('member-occupation').value,
+                        residence: document.getElementById('member-residence').value,
+                        dob: document.getElementById('member-dob').value,
+                        dod: document.getElementById('member-dod').value,
+                        photo: document.getElementById('member-photo').value || 'https://placehold.co/80x80/e0e0e0/333?text=Photo' // Default photo
+                    };
+
+                    console.log("New Member Data:", newMember); // Log the data
+
+                    // In a real application, you would send this data to a backend API
+                    // and then potentially update the membersData array and re-render the members list.
+
+                    alert("New member data logged to console. (Persistence not implemented in this demo)"); // Basic feedback
+
+                    // Clear the form (optional)
+                    addMemberForm.reset();
+                    // Re-render the admin member list to show the new member (in a real app, this would come from the backend)
+                     membersData.push(newMember); // Add to sample data for demo
+                     applyFiltersAndUpdateDisplay(); // Re-render lists and update stats
                 });
-            });
+            }
 
-            // Handle hamburger button click to toggle mobile menu
-            hamburgerButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('is-open');
-            });
-
-             // Handle "View details" button clicks (Delegation for dynamically added buttons)
-             // We use event delegation on the membersGrid since the buttons are inside member cards
-             // Check if membersGrid exists before adding listener (it's only on the members page)
-             if (membersGrid) {
-                 membersGrid.addEventListener('click', (event) => {
+            // Handle Edit/Delete buttons in the Admin Member List (Delegation)
+            if (adminMemberList) {
+                 adminMemberList.addEventListener('click', (event) => {
                      const target = event.target;
-                     if (target.classList.contains('view-details-button') || target.closest('.view-details-button')) {
-                          const button = target.closest('.view-details-button');
-                          const memberId = button.getAttribute('data-member-id');
-                          openModal(memberId);
+                     const listItem = target.closest('.member-list-admin-item');
+                     if (!listItem) return; // Exit if click wasn't inside a list item
+
+                     const memberId = listItem.getAttribute('data-member-id');
+
+                     if (target.classList.contains('edit-button')) {
+                         console.log("Edit button clicked for member ID:", memberId);
+                         // TODO: Implement edit functionality (e.g., populate a form with member data)
+                         alert(`Edit functionality for member ID ${memberId} not implemented.`);
+                     } else if (target.classList.contains('delete-button')) {
+                         console.log("Delete button clicked for member ID:", memberId);
+                         // TODO: Implement delete functionality (e.g., confirm and remove member)
+                         const confirmDelete = confirm(`Are you sure you want to delete member with ID ${memberId}?`);
+                         if (confirmDelete) {
+                             // In a real app, send delete request to backend
+                             alert(`Delete functionality for member ID ${memberId} not implemented.`);
+                             // For demo, remove from sample data and re-render
+                             const index = membersData.findIndex(member => member.id === memberId);
+                             if (index !== -1) {
+                                 membersData.splice(index, 1);
+                                 applyFiltersAndUpdateDisplay(); // Re-render lists and update stats
+                             }
+                         }
                      }
                  });
-             }
-
-
-            // Handle closing modal via button
-            closeModalButton.addEventListener('click', closeModal);
-
-            // Handle closing modal via clicking outside the content (overlay)
-            modalOverlay.addEventListener('click', (event) => {
-                if (event.target === modalOverlay) { // Check if the click was directly on the overlay
-                    closeModal();
-                }
-            });
-
-            // Close modal with Escape key
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && modalOverlay.classList.contains('is-visible')) {
-                    closeModal();
-                }
-            });
-
-            // Handle gallery tab button clicks
-            galleryTabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const tabId = button.getAttribute('data-gallery-tab');
-                    showGalleryTab(tabId);
-                    updateActiveGalleryTabButton(tabId);
-                });
-            });
-
-             // Handle generation filter button clicks (Placeholder for actual filtering logic)
-             // This listener is now added to all generation filter buttons
-             document.querySelectorAll('.generation-filters .generation-filter-button').forEach(button => {
-                 button.addEventListener('click', () => {
-                      const filterText = button.textContent.trim();
-                      console.log("Filter by:", filterText); // Placeholder for filtering logic
-                      // Determine which filter container this button belongs to
-                      const filterContainer = button.closest('.generation-filters');
-                      if (filterContainer) {
-                           updateActiveGenerationFilterButton(filterText, filterContainer.id);
-                           // If the click is on a sidebar filter button, apply filters and update stats
-                           if (filterContainer.id === 'sidebar-generation-filters') {
-                                applyFiltersAndUpdateDisplay(); // Use the new display function
-                           }
-                           // TODO: Implement actual filtering of member cards/gallery items based on selected generation
-                      }
-                 });
-             });
-
-
-             // Handle view toggle button clicks (Placeholder for actual view switching logic)
-             viewToggleButtons.forEach(button => {
-                 button.addEventListener('click', () => {
-                      const view = button.getAttribute('data-view');
-                      console.log("Switching to view:", view); // Placeholder for view switching logic
-                      updateActiveViewToggleButton(view);
-                      // TODO: Implement actual switching between grid and list view classes on membersGrid
-                      if (membersGrid) { // Check if membersGrid exists before manipulating classes
-                           if (view === 'list') {
-                               membersGrid.classList.add('list-view');
-                               membersGrid.classList.remove('grid'); // Remove Tailwind grid classes
-                               membersGrid.classList.remove('grid-cols-1', 'sm:grid-cols-2', 'lg:grid-cols-3', 'gap-4'); // Remove specific grid classes
-                           } else { // grid view
-                                membersGrid.classList.remove('list-view');
-                                membersGrid.classList.add('grid'); // Add Tailwind grid classes back
-                                membersGrid.classList.add('grid-cols-1', 'sm:grid-cols-2', 'lg:grid-cols-3', 'gap-4'); // Add specific grid classes back
-                           }
-                      }
-                 });
-             });
+            }
 
 
             // Show the initial section based on the URL hash or default to tree-view
